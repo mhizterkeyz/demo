@@ -91,6 +91,8 @@
 
       <p>Base: <span id="base-amount"></span></p>
       <p>Percentage: <span id="percentage"></span></p>
+      <p>Tax Relief: <span id="relief"></span></p>
+      <p>Taxalbe Income: <span id="taxable"></span></p>
     </div>
     <script>
       function getBase(preferedTax) {
@@ -135,6 +137,12 @@
 
           document.querySelector("#base-amount").innerText = Number(
             base.toFixed(2)
+          ).toLocaleString();
+          document.querySelector("#relief").innerText = Number(
+            (base - taxableIncome).toFixed(2)
+          ).toLocaleString();
+          document.querySelector("#taxable").innerText = Number(
+            taxableIncome.toFixed(2)
           ).toLocaleString();
           document.querySelector("#percentage").innerText = +(
             (value / base) *
