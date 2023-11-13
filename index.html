@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+    </style>
   </head>
   <body
     style="
@@ -14,19 +19,77 @@
     "
   >
     <div>
-      <input
-        type="number"
-        placeholder="Enter desired tax amount"
-        style="
-          border-radius: 4px;
-          border: 1px solid #ccc;
-          padding: 12px 6px;
-          width: 300px;
-          max-width: 100%;
-        "
-      />
+      <p>
+        <label for="pension">
+          <input type="checkbox" id="pension" />Enable Pension
+        </label>
 
-      <p>Base: <spna id="base-amount"></spna></p>
+        <label for="nhf"> <input type="checkbox" id="nhf" />Enable NHF </label>
+      </p>
+      <p>
+        <label>Health Relief(optional):</label><br />
+        <input
+          type="number"
+          id="health"
+          placeholder="Enter health relief amount"
+          style="
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            padding: 12px 6px;
+            width: 300px;
+            max-width: 100%;
+          "
+        />
+      </p>
+
+      <p>
+        <label>BHT(Comma separated):</label><br />
+        <input
+          type="number"
+          id="bht"
+          placeholder="ex. 40, 30, 30"
+          style="
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            padding: 12px 6px;
+            width: 300px;
+            max-width: 100%;
+          "
+        />
+      </p>
+
+      <p>
+        <label>Desired tax amount:</label><br />
+        <input
+          type="number"
+          id="value"
+          placeholder="Enter desired tax amount"
+          style="
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            padding: 12px 6px;
+            width: 300px;
+            max-width: 100%;
+          "
+        />
+      </p>
+
+      <p>
+        <button
+          style="
+            border-radius: 4px;
+            border: none;
+            padding: 12px 6px;
+            width: 300px;
+            max-width: 100%;
+            cursor: pointer;
+          "
+        >
+          Calculate
+        </button>
+      </p>
+
+      <p>Base: <span id="base-amount"></span></p>
       <p>Percentage: <span id="percentage"></span></p>
     </div>
     <script>
@@ -47,10 +110,28 @@
         return 25000 + ((preferedTax - 1750.0000000000002) * 100) / 7;
       }
 
-      document.querySelector("input").addEventListener("input", (e) => {
-        const value = Number(e.target.value);
-        if (!Number.isNaN(value)) {
-          const base = getBase(value);
+      document.querySelector("button").addEventListener("click", () => {
+        const enablePension = document.querySelector("#pension").checked;
+        const enableNHF = document.querySelector("#nhf").checked;
+        const value = Number(document.querySelector("#value").value);
+        const bht = document.querySelector("#bht").value;
+        const health = Number(document.querySelector("#health").value) || 0;
+        let [basic = "100", housing = "0", transport = "0"] = bht.split(",");
+
+        basic = Number(basic.trim()) || 100;
+        housing = Number(housing.trim());
+        transport = Number(transport.trim());
+
+        const bhtPercent = (basic + housing + transport) / 100;
+        const pension = enablePension ? bhtPercent * 0.08 : 0;
+        const nhf = enableNHF ? bhtPercent * 0.025 : 0;
+
+        if (value) {
+          const taxableIncome = getBase(value);
+          const base = Math.max(
+            taxableIncome / (1 - nhf - pension - health - 0.01 - 0.2),
+            (taxableIncome + 200000 / 12) / (1 - nhf - pension - health - 0.2)
+          );
 
           document.querySelector("#base-amount").innerText = Number(
             base.toFixed(2)
