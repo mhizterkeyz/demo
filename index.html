@@ -131,8 +131,8 @@
         if (value) {
           const taxableIncome = getBase(value);
           const base = Math.max(
-            taxableIncome / (1 - nhf - pension - health - 0.01 - 0.2),
-            (taxableIncome + 200000 / 12) / (1 - nhf - pension - health - 0.2)
+            (taxableIncome + pension + health + nhf) / (1 - 0.01 - 0.2),
+            (taxableIncome + pension + health + nhf + 200e3 / 12) / (1 - 0.2)
           );
 
           document.querySelector("#base-amount").innerText = Number(
